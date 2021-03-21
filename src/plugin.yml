@@ -1,0 +1,17 @@
+name: FindClass
+main: findclass.FindClassPlugin
+author: Sheidy
+version: 1.0
+description: 'Find which plugin(s) contains a certain class, useful for debugging.'
+
+commands:
+  findclass:
+    description: 'Find which plugin(s) contains a certain class'
+    usage: 'Use /findclass <className>'
+    permission: findclass.use
+
+permissions:
+  findclass.use:
+    default: op
+
+#end
