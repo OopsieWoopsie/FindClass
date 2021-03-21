@@ -1,8 +1,9 @@
 package findclass;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URLClassLoader;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -21,7 +22,7 @@ public class FindClassPlugin extends JavaPlugin {
         Method findClass;
 
         try {
-            findClass = URLClassLoader.class.getMethod("findClass", String.class);
+            findClass = getClassLoader().getClass().getDeclaredMethod("findClass", String.class, boolean.class);
             findClass.setAccessible(true);
         } catch (NoSuchMethodException e) {
             sender.sendMessage("Failed to get findClass() method: " + e.getMessage());
@@ -35,16 +36,19 @@ public class FindClassPlugin extends JavaPlugin {
             ClassLoader classLoader = plugin.getClass().getClassLoader();
 
             try {
-                findClass.invoke(classLoader, className);
+                findClass.invoke(classLoader, className, false);
                 foundCount++;
                 sender.sendMessage("Found on plugin: " + plugin.getName());
             } catch (Exception e) {
-                if (e instanceof ClassNotFoundException) {
-                    // this is fine
-                } else {
-                    sender.sendMessage("Failed to run findClass() : " + e.toString());
-                    return true;
+                if (e instanceof InvocationTargetException) {
+                    if (e.getCause() instanceof ClassNotFoundException) {
+                        continue; // this is fine
+                    }
                 }
+
+                sender.sendMessage("Failed to run findClass() : " + e.getMessage());
+                e.printStackTrace();
+                return true;
             }
         }
 
