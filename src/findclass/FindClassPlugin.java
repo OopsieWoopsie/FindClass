@@ -3,7 +3,6 @@ package findclass;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -35,19 +34,26 @@ public class FindClassPlugin extends JavaPlugin {
         for (Plugin plugin : getServer().getPluginManager().getPlugins()) {
             ClassLoader classLoader = plugin.getClass().getClassLoader();
 
+            if (!plugin.isEnabled()) {
+                sender.sendMessage(plugin.getName() + " > Skipping (disabled)");
+                continue;
+            }
+
             try {
                 findClass.invoke(classLoader, className, false);
                 foundCount++;
-                sender.sendMessage("Found on plugin: " + plugin.getName());
+                sender.sendMessage(plugin.getName() + " > Class found!");
             } catch (Exception e) {
                 if (e instanceof InvocationTargetException) {
-                    if (e.getCause() instanceof ClassNotFoundException) {
+                    Throwable ex = e.getCause();
+
+                    if (ex instanceof ClassNotFoundException) {
                         continue; // this is fine
                     }
-                }
 
-                sender.sendMessage("Failed to run findClass() : " + e.getMessage());
-                e.printStackTrace();
+                    sender.sendMessage(plugin.getName() + " > Failed : " + ex.getMessage());
+                    continue;
+                }
                 return true;
             }
         }
