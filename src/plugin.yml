@@ -1,7 +1,7 @@
 name: FindClass
 main: findclass.FindClassPlugin
 author: Sheidy
-version: 1.0
+version: 2.0
 description: 'Find which plugin(s) contains a certain class, useful for debugging.'
 
 commands:
